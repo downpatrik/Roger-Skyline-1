@@ -122,7 +122,7 @@ user@roger:~$ sudo vim /etc/fail2ban/jail.local
 > enabled = true
 > port = http,https
 > filter = http-get-dos
-> logpath = /var/log/apache2/access.log (le fichier d'access sur server web)
+> logpath = /var/log/access.log
 > maxretry = 300
 > findtime = 300
 > bantime = 600
