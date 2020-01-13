@@ -284,13 +284,13 @@ user@roger:~$ sudo nginx -t
 user@roger:~$ sudo systemctl reload nginx
 ```
 ### Deployment Part
-### Propose a functional solution for deployment automation.
+#### Propose a functional solution for deployment automation.
 The deployment script deploy.sh can be run after the prerequisites are met which are:
 ```console
 1) A VM has been created using Virtualbox with the settings stated above.
-2) The VM network is set to Bridged Adapter.
+2) The VM network is set to Port Forwarding.
 3) sudo has been set up for the user.
-4) Git is installed on the VM ("user@roger:~$ apt-get install git" as root)
+4) Git is installed on the VM ("$ apt-get install git" as root)
 ```
 Clone the repository to the VM:
 ```console
