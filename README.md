@@ -28,8 +28,10 @@ $ exit
 ### We don’t want you to use the DHCP service of your machine. You’ve got to configure it to have a static IP and a Netmask in \30.
 ```console
 $ su
-$ ip ad | grep 'inet ' | awk '(NR == 2)' | awk '{print $2}' | cut -d '/' -f1 #address  
-$ ip route | awk '(NR == 2)' | awk '{ print $1 }'  | cut -d / -f 1 | grep default gateway
+$ ip ad | grep 'inet ' | awk '(NR == 2)' | awk '{print $2}' | cut -d '/' -f1
+# address
+$ ip route | awk '(NR == 2)' | awk '{ print $1 }'  | cut -d / -f 1 | grep default
+# gateway
 $ sudo vim /etc/network/interfaces
 # Static ip address for enp0s3
 > iface enp0s3 inet static
@@ -88,7 +90,6 @@ $ sudo vim /etc/fail2ban/jail.local
 > findtime = 300
 > bantime = 600
 > action = iptables[name=HTTP, port=http, protocol=tcp]
-$ 
 $ sudo vim /etc/fail2ban/filter.d/http-get-dos.conf
 > [Definition]
 > failregex = ^<HOST> -.*"(GET|POST).*
@@ -141,7 +142,7 @@ $ vim cronMonitor.sh
 > FILE="/home/user/cron_md5"
 > MD5="$(sudo md5sum '/etc/crontab' | awk '{print $1}') "
 >
-> if [! -f $FILE ]
+> if [ ! -f $FILE]
 > then
 >   sudo touch $FILE
 >   sudo chmod 777 $FILE
@@ -157,3 +158,88 @@ $ sudo chmod 755 cronMonitor.sh
 $ sudo crontab -e
 > 0 0 * * * sudo ~/cronMonitor.sh
 ```
+## V.4 Optional Part
+### Web Part
+### You have to set a web server who should BE available on the VM’s IP or an host (init.login.com for exemple). About the packages of your web server, you can choose between Nginx and Apache. You have to set a self-signed SSL on all of your services. You have to set a web "application" from those choices
+* A login page.
+* A display site.
+* A wonderful website that blow our minds.
+```console
+$ sudo apt install -y nginx
+$ systemctl status nginx
+$ sudo mkdir -p /var/www/roger-skyline/html
+$ sudo chown -R $USER:$USER /var/www/roger-skyline/html/
+$ sudo chmod -R 0755 /var/www/roger-skyline/
+$ sudo vim /var/www/roger-skyline/html/index.html
+# [See my login page](web/index.html)
+$ sudo chmod 0644 /var/www/roger-skyline/html/index.html
+$ sudo vim /etc/nginx/sites-available/roger-skyline
+> server {
+> 	listen 80;
+> 	listen [::]:80;
+> 
+> 	root /var/www/roger-skyline/html;
+> 	index index.html;
+> 
+> 	server_name roger-skyline.com www.roger-skyline.com;
+> 
+> 	location / {
+> 		try_files $uri $uri/ =404;
+> 	}
+> }
+$ sudo ln -s /etc/nginx/sites-available/roger-skyline /etc/nginx/sites-enabled/
+$ sudo systemctl restart nginx
+#SSL
+$ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt
+$ sudo openssl dhparam -out /etc/nginx/dhparam.pem 4096
+$ sudo vim /etc/nginx/snippets/self-signed.conf
+> ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;
+> ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
+$ sudo vim /etc/nginx/snippets/ssl-params.conf
+> ssl_protocols TLSv1.2;
+> ssl_prefer_server_ciphers on;
+> ssl_dhparam /etc/nginx/dhparam.pem;
+> ssl_ciphers
+> ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384;
+> ssl_ecdh_curve secp384r1; # Requires nginx >= 1.1.0
+> ssl_session_timeout  10m;
+> ssl_session_cache shared:SSL:10m;
+> ssl_session_tickets off; # Requires nginx >= 1.5.9
+> # ssl_stapling on; # Requires nginx >= 1.3.7
+> # ssl_stapling_verify on; # Requires nginx => 1.3.7
+> resolver 8.8.8.8 8.8.4.4 valid=300s;
+> resolver_timeout 5s;
+> add_header X-Frame-Options DENY;
+> add_header X-Content-Type-Options nosniff;
+> add_header X-XSS-Protection "1; mode=block";
+$ sudo chmod 0644 /etc/nginx/snippets/ssl-params.conf
+$ sudo vim /etc/nginx/sites-available/roger-skyline
+> server {
+> 	listen 443 ssl;
+> 	listen [::]:443 ssl;
+> 	include snippets/self-signed.conf;
+> 	include snippets/ssl-params.conf;
+> 
+> 	root /var/www/roger-skyline/html;
+> 	index index.html;
+> 
+> 	server_name roger-skyline.com www.roger-skyline.com;
+> 
+> 	location / {
+> 		try_files $uri $uri/ =404;
+> 	}
+> }
+> 
+> server {
+> 	listen 80;
+> 	listen [::]:80;
+> 
+> 	server_name roger-skyline.com www.roger-skyline.com;
+> 
+> 	return 302 https://$server_name$request_uri;
+> }
+$ sudo nginx -t
+$ sudo systemctl reload nginx
+```
+### Deployment Part
+### Propose a functional solution for deployment automation.
