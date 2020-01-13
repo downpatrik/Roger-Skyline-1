@@ -171,7 +171,9 @@ $ sudo mkdir -p /var/www/roger-skyline/html
 $ sudo chown -R $USER:$USER /var/www/roger-skyline/html/
 $ sudo chmod -R 0755 /var/www/roger-skyline/
 $ sudo vim /var/www/roger-skyline/html/index.html
-# [See my login page](web/index.html)
+```
+[See my login page](web/index.html)
+```console
 $ sudo chmod 0644 /var/www/roger-skyline/html/index.html
 $ sudo vim /etc/nginx/sites-available/roger-skyline
 > server {
@@ -189,7 +191,7 @@ $ sudo vim /etc/nginx/sites-available/roger-skyline
 > }
 $ sudo ln -s /etc/nginx/sites-available/roger-skyline /etc/nginx/sites-enabled/
 $ sudo systemctl restart nginx
-#SSL
+# SSL
 $ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt
 $ sudo openssl dhparam -out /etc/nginx/dhparam.pem 4096
 $ sudo vim /etc/nginx/snippets/self-signed.conf
@@ -243,3 +245,20 @@ $ sudo systemctl reload nginx
 ```
 ### Deployment Part
 ### Propose a functional solution for deployment automation.
+The deployment script deploy.sh can be run after the prerequisites are met which are:
+```console
+1) A VM has been created using Virtualbox with the settings stated above.
+2) The VM network is set to Bridged Adapter.
+3) sudo has been set up for the user.
+4) Git is installed on the VM ("$ apt-get install git" as root)
+```
+Clone the repository to the VM:
+```console
+git clone https://github.com/downpatrik/Roger-Skyline-1
+```
+Execute the deployment script (must be done with sudo):
+```console
+$ chmod +x ./deploy.sh
+$ sudo ./deploy.sh
+```
+Test that the deployment went fine by logging in to `192.168.10.42://login.html` on the host machine browser.
