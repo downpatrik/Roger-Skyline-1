@@ -76,13 +76,19 @@ user@roger:~$ sudo reboot
 ```console
 user@roger:~$ su
 user@roger:~$ sudo vim /etc/ssh/sshd_config
+...
 > Port 2121
+...
 > PermitRootLogin no
+...
 > PasswordAuthentication no
+...
 > AuthorizedKeysFile .ssh/authorized_keys
 user@roger:~$ sudo service sshd restart
 ```
 * Client
+![port0](img/port0.png)
+![port1](img/port1.png)
 On MacOS port 1111, because port forwarding on VM to 2121
 ```console
 user@roger:~$ ssh-keygen -t rsa
@@ -90,8 +96,6 @@ user@roger:~$ ssh-copy-id -i id_rsa.pub user@127.0.0.1 -p1111
 user@roger:~$ ssh -p1111 user@127.0.1.1
 ```
 ### You have to set the rules of your firewall on your server only with the services used outside the VM.
-![port0](img/port0.png)
-![port1](img/port1.png)
 ```console
 user@roger:~$ sudo ufw status
 user@roger:~$ sudo ufw enable
@@ -189,6 +193,7 @@ user@roger:~$ vim cronMonitor.sh
 > fi;
 user@roger:~$ sudo chmod 755 cronMonitor.sh
 user@roger:~$ sudo crontab -e
+...
 > 0 0 * * * sudo ~/cronMonitor.sh
 ```
 ## V.4 Optional Part
@@ -201,7 +206,7 @@ user@roger:~$ sudo crontab -e
 user@roger:~$ sudo apt install -y nginx
 user@roger:~$ systemctl status nginx
 user@roger:~$ sudo mkdir -p /var/www/roger-skyline/html
-user@roger:~$ sudo chown -R user@roger:~$USER:user@roger:~$USER /var/www/roger-skyline/html/
+user@roger:~$ sudo chown -R $USER:$USER /var/www/roger-skyline/html/
 user@roger:~$ sudo chmod -R 0755 /var/www/roger-skyline/
 user@roger:~$ sudo vim /var/www/roger-skyline/html/index.html
 ```
@@ -219,7 +224,7 @@ user@roger:~$ sudo vim /etc/nginx/sites-available/roger-skyline
 > 	server_name roger-skyline.com www.roger-skyline.com;
 > 
 > 	location / {
-> 		try_files user@roger:~$uri user@roger:~$uri/ =404;
+> 		try_files $uri $uri/ =404;
 > 	}
 > }
 user@roger:~$ sudo ln -s /etc/nginx/sites-available/roger-skyline /etc/nginx/sites-enabled/
@@ -263,7 +268,7 @@ user@roger:~$ sudo vim /etc/nginx/sites-available/roger-skyline
 > 	server_name roger-skyline.com www.roger-skyline.com;
 > 
 > 	location / {
-> 		try_files user@roger:~$uri user@roger:~$uri/ =404;
+> 		try_files $uri $uri/ =404;
 > 	}
 > }
 > 
@@ -273,7 +278,7 @@ user@roger:~$ sudo vim /etc/nginx/sites-available/roger-skyline
 > 
 > 	server_name roger-skyline.com www.roger-skyline.com;
 > 
-> 	return 302 https://user@roger:~$server_nameuser@roger:~$request_uri;
+> 	return 302 https://$server_name$request_uri;
 > }
 user@roger:~$ sudo nginx -t
 user@roger:~$ sudo systemctl reload nginx
