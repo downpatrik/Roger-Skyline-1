@@ -198,7 +198,7 @@ user@roger:~$ sudo crontab -e
 ```
 ## V.4 Optional Part
 ### Web Part
-### You have to set a web server who should BE available on the VM’s IP or an host (init.login.com for exemple). About the packages of your web server, you can choose between Nginx and Apache. You have to set a self-signed SSL on all of your services. You have to set a web "application" from those choices
+#### You have to set a web server who should BE available on the VM’s IP or an host (init.login.com for exemple). About the packages of your web server, you can choose between Nginx and Apache. You have to set a self-signed SSL on all of your services. You have to set a web "application" from those choices
 * A login page.
 * A display site.
 * A wonderful website that blow our minds.
@@ -302,3 +302,7 @@ user@roger:~$ chmod +x ./deploy.sh
 user@roger:~$ sudo ./deploy.sh
 ```
 Test that the deployment went fine by logging in to `http://10.0.2.15` on the host machine browser.
+To get a checksum of the VM disk, go to /home/admin/VirtualBox VMs/, select the VM and then run:
+```console
+$ shasum < [vdi file] #57fb2cee50392faa95bc601e0957bc68b1d5529e
+```
